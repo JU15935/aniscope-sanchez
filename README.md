@@ -1,73 +1,23 @@
-# React + TypeScript + Vite
+# AniScope
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Estudiante:** Juan Miguel Sánchez Chaverra 
+**Fecha:** 17 de abril de 2026
 
-Currently, two official plugins are available:
+## Decisiones arquitectónicas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Se siguió una arquitectura modular por dominio (`core/`, `design/`, `modules/`) para separar claramente las responsabilidades: la capa `core` centraliza la configuración de API y estado global, `design` contiene componentes reutilizables sin lógica de negocio, y `modules` encapsula cada dominio con sus propios tipos, servicios y hooks. Esta separación permite escalar el proyecto añadiendo nuevos módulos sin tocar código existente.
 
-## React Compiler
+## Cómo correr el proyecto
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Decisiones técnicas relevantes
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Axios + interceptor**: toda instancia HTTP pasa por `api-client.ts`, que convierte errores HTTP en mensajes legibles. Ningún componente llama a `fetch` directamente.
+- **Zod en el service**: la validación ocurre en `anime.service.ts` antes de retornar datos. TypeScript solo garantiza tipos en compilación; Zod garantiza la forma real de la respuesta en runtime.
+- **TanStack Query**: `staleTime` de 2 minutos y `retry: 1` para respetar el rate limit de 3 req/s de Jikan. `keepPreviousData` en el listado evita parpadeos al paginar.
+- **useDebounce en `core/hooks`**: es un hook genérico sin dependencia de ningún módulo, por eso vive en `core` y no en `modules/anime`.
+- **localStorage en `useEffect`**: escribir en el handler sincrónico podría causar inconsistencias si React re-renderiza antes de completar la actualización. El `useEffect` observa `favorites` y escribe solo después de que el estado está confirmado.
