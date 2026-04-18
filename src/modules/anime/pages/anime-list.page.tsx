@@ -11,6 +11,10 @@ import {
   FilterChip,
   Button,
   ListLayout,
+  IconHeart,
+  IconTv,
+  IconChevronLeft,
+  IconChevronRight,
 } from '@/design';
 import type { AnimeStatus } from '@/modules/anime/types';
 
@@ -30,18 +34,24 @@ export function AnimeListPage() {
 
   const header = (
     <div className="flex items-center justify-between">
-      <div>
-        <h1 className="text-3xl font-bold text-white">🎌 AniScope</h1>
-        <p className="mt-1 text-sm text-gray-400">Descubre tu próximo anime favorito</p>
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 shadow-lg shadow-purple-900/40">
+          <IconTv size={20} className="text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">AniScope</h1>
+          <p className="text-xs text-gray-400">Descubre tu próximo anime favorito</p>
+        </div>
       </div>
-      <Button variant="ghost" onClick={() => navigate('/favorites')}>
-        ❤️ Favoritos
+      <Button variant="ghost" onClick={() => navigate('/favorites')} className="flex items-center gap-2">
+        <IconHeart size={16} className="text-red-400" />
+        <span className="hidden sm:inline">Favoritos</span>
       </Button>
     </div>
   );
 
   const filtersSection = (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <SearchBar
         value={filters.query}
         onChange={setQuery}
@@ -85,16 +95,20 @@ export function AnimeListPage() {
         disabled={filters.page === 1}
         onClick={() => setPage(filters.page - 1)}
       >
-        ← Anterior
+        <IconChevronLeft size={16} />
+        Anterior
       </Button>
-      <span className="text-sm text-gray-400">Página {filters.page}</span>
+      <span className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-1.5 text-sm text-gray-300">
+        Página {filters.page}
+      </span>
       <Button
         variant="secondary"
         size="sm"
         disabled={!data?.pagination.has_next_page}
         onClick={() => setPage(filters.page + 1)}
       >
-        Siguiente →
+        Siguiente
+        <IconChevronRight size={16} />
       </Button>
     </div>
   );
@@ -118,8 +132,10 @@ export function AnimeListPage() {
     );
   } else if (data?.data.length === 0) {
     content = (
-      <div className="flex flex-col items-center gap-3 py-20 text-center">
-        <span className="text-5xl">🔍</span>
+      <div className="flex flex-col items-center gap-4 py-20 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-800 border border-gray-700">
+          <IconTv size={28} className="text-gray-500" />
+        </div>
         <p className="text-gray-400">No se encontraron resultados para tu búsqueda.</p>
       </div>
     );

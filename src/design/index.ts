@@ -16,3 +16,4 @@ export { AnimeCardSkeleton } from './organisms/anime-card-skeleton';
 // Templates
 export { ListLayout } from './templates/list-layout';
 export { DetailLayout } from './templates/detail-layout';
+export { IconSearch, IconHeart, IconStar, IconArrowLeft, IconChevronLeft, IconChevronRight, IconAlertTriangle, IconRefresh, IconCompass, IconTrash, IconTv } from './atoms/icon';

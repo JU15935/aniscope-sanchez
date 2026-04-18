@@ -8,6 +8,12 @@ import {
 } from '@/modules/anime/schemas/anime.schema';
 import type { Anime, AnimeFilters, Genre } from '@/modules/anime/types';
 
+const STATUS_MAP: Record<string, string> = {
+  'Currently Airing': 'airing',
+  'Finished Airing': 'complete',
+  'Not yet aired': 'upcoming',
+};
+
 export async function fetchAnimeList(
   filters: AnimeFilters
 ): Promise<JikanPaginatedResponse<Anime>> {
@@ -18,7 +24,7 @@ export async function fetchAnimeList(
 
   if (filters.query.trim()) params['q'] = filters.query.trim();
   if (filters.genreId !== null) params['genres'] = filters.genreId;
-  if (filters.status !== 'all') params['status'] = filters.status;
+  if (filters.status !== 'all') params['status'] = STATUS_MAP[filters.status];
 
   const { data } = await apiClient.get<unknown>('/anime', { params });
   return animeListResponseSchema.parse(data);
